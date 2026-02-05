@@ -3,7 +3,7 @@ Factory Productivity Dashboard - Backend API
 Production-grade Flask REST API with comprehensive documentation
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from flask_restx import Api, Resource, fields, Namespace
 import os
@@ -25,8 +25,22 @@ from database import (
 # SETUP & CONFIGURATION
 # ============================================================================
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend'))
 CORS(app)
+
+# Serve frontend
+@app.route('/')
+def serve_frontend():
+    """Serve the frontend dashboard"""
+    try:
+        frontend_path = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'index.html')
+        if os.path.exists(frontend_path):
+            return send_file(frontend_path)
+        else:
+            return {"error": "Frontend not found"}, 404
+    except Exception as e:
+        logger.error(f"Error serving frontend: {str(e)}")
+        return {"error": str(e)}, 500
 
 # API Setup with Swagger documentation
 api = Api(
