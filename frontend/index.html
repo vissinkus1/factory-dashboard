@@ -319,37 +319,38 @@
 
         async function loadFactoryMetrics() {
             const response = await fetch(`${API_BASE}/metrics/factory`);
-            const data = await response.json();
+            const result = await response.json();
+            const data = result.data || result;  // Handle both old and new format
 
             const html = `
                 <div class="metric-card">
                     <h3>Productive Time</h3>
-                    <div class="metric-value">${data.total_productive_time_hours}</div>
+                    <div class="metric-value">${(data.total_productive_time_hours || 0).toFixed(2)}</div>
                     <div class="metric-unit">Hours</div>
                 </div>
                 <div class="metric-card">
                     <h3>Total Production</h3>
-                    <div class="metric-value">${data.total_production_count}</div>
+                    <div class="metric-value">${data.total_production_count || 0}</div>
                     <div class="metric-unit">Units</div>
                 </div>
                 <div class="metric-card">
                     <h3>Production Rate</h3>
-                    <div class="metric-value">${data.average_production_rate}</div>
+                    <div class="metric-value">${(data.average_production_rate || 0).toFixed(2)}</div>
                     <div class="metric-unit">Units/Hour</div>
                 </div>
                 <div class="metric-card">
                     <h3>Avg Utilization</h3>
-                    <div class="metric-value percentage">${data.average_utilization_percentage}%</div>
+                    <div class="metric-value percentage">${(data.average_utilization_percentage || 0).toFixed(2)}%</div>
                     <div class="metric-unit">Across all workers</div>
                 </div>
                 <div class="metric-card">
                     <h3>Active Stations</h3>
-                    <div class="metric-value">${data.station_count}</div>
+                    <div class="metric-value">${data.station_count || 0}</div>
                     <div class="metric-unit">Workstations</div>
                 </div>
                 <div class="metric-card">
                     <h3>Active Workers</h3>
-                    <div class="metric-value">${data.worker_count}</div>
+                    <div class="metric-value">${data.worker_count || 0}</div>
                     <div class="metric-unit">Workers</div>
                 </div>
             `;
@@ -358,12 +359,16 @@
 
         async function loadWorkerMetrics() {
             const response = await fetch(`${API_BASE}/metrics/workers`);
-            const workers = await response.json();
+            const result = await response.json();
+            const workers = result.data || result;  // Handle both old and new format
+
+            // Ensure workers is an array
+            const workerArray = Array.isArray(workers) ? workers : [];
 
             // Populate filter
             const filter = document.getElementById('worker-filter');
             filter.innerHTML = '<option value="">All Workers</option>';
-            workers.forEach(w => {
+            workerArray.forEach(w => {
                 const option = document.createElement('option');
                 option.value = w.worker_id;
                 option.textContent = `${w.worker_id} - ${w.name}`;
@@ -372,27 +377,31 @@
 
             // Populate table
             const tbody = document.querySelector('#workers-table tbody');
-            tbody.innerHTML = workers.map(w => `
+            tbody.innerHTML = workerArray.map(w => `
                 <tr onclick="showWorkerDetail('${w.worker_id}', '${w.name}')">
                     <td>${w.worker_id}</td>
                     <td>${w.name}</td>
-                    <td>${w.total_active_time_hours}</td>
-                    <td>${w.total_idle_time_hours}</td>
-                    <td><span class="percentage">${w.utilization_percentage}%</span></td>
-                    <td>${w.total_units_produced}</td>
-                    <td>${w.units_per_hour}</td>
+                    <td>${(w.total_active_time_hours || 0).toFixed(2)}</td>
+                    <td>${(w.total_idle_time_hours || 0).toFixed(2)}</td>
+                    <td><span class="percentage">${(w.utilization_percentage || 0).toFixed(2)}%</span></td>
+                    <td>${w.total_units_produced || 0}</td>
+                    <td>${(w.units_per_hour || 0).toFixed(2)}</td>
                 </tr>
             `).join('');
         }
 
         async function loadWorkstationMetrics() {
             const response = await fetch(`${API_BASE}/metrics/workstations`);
-            const stations = await response.json();
+            const result = await response.json();
+            const stations = result.data || result;  // Handle both old and new format
+
+            // Ensure stations is an array
+            const stationArray = Array.isArray(stations) ? stations : [];
 
             // Populate filter
             const filter = document.getElementById('station-filter');
             filter.innerHTML = '<option value="">All Workstations</option>';
-            stations.forEach(s => {
+            stationArray.forEach(s => {
                 const option = document.createElement('option');
                 option.value = s.station_id;
                 option.textContent = `${s.station_id} - ${s.name}`;
@@ -401,15 +410,15 @@
 
             // Populate table
             const tbody = document.querySelector('#stations-table tbody');
-            tbody.innerHTML = stations.map(s => `
+            tbody.innerHTML = stationArray.map(s => `
                 <tr onclick="showStationDetail('${s.station_id}', '${s.name}')">
                     <td>${s.station_id}</td>
                     <td>${s.name}</td>
-                    <td>${s.type}</td>
-                    <td>${s.occupancy_time_hours}</td>
-                    <td><span class="percentage">${s.utilization_percentage}%</span></td>
-                    <td>${s.total_units_produced}</td>
-                    <td>${s.throughput_rate}</td>
+                    <td>${s.type || 'Assembly'}</td>
+                    <td>${(s.occupancy_time_hours || 0).toFixed(2)}</td>
+                    <td><span class="percentage">${(s.utilization_percentage || 0).toFixed(2)}%</span></td>
+                    <td>${s.total_units_produced || 0}</td>
+                    <td>${(s.throughput_rate || 0).toFixed(2)}</td>
                 </tr>
             `).join('');
         }
