@@ -300,8 +300,15 @@
     </div>
 
     <script>
-        // Dynamically build API URL based on current hostname
-        const API_BASE = `http://${window.location.hostname}:5000/api`;
+        // Dynamically build API URL based on environment
+        let API_BASE;
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Local development: use explicit port 5000 with http
+            API_BASE = `http://${window.location.hostname}:5000/api`;
+        } else {
+            // Deployed: use same domain and protocol, with /api path
+            API_BASE = `${window.location.protocol}//${window.location.host}/api`;
+        }
 
         async function loadData() {
             try {
