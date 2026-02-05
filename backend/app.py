@@ -48,7 +48,8 @@ api = Api(
     version='1.0.0',
     title='Factory Productivity Dashboard API',
     description='Production-grade API for managing factory productivity metrics and events',
-    doc='/docs'
+    prefix='/api',
+    doc='/api/docs'
 )
 
 # Setup logging
