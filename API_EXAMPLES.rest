@@ -1,0 +1,154 @@
+# Factory Dashboard API - Sample Requests
+# 
+# This file contains example API requests that can be used to test the backend.
+# 
+# Tools to use:
+# - curl (command line)
+# - Postman (GUI)
+# - HTTPClient plugin in VS Code
+# - REST Client extension in VS Code
+
+###
+# 1. HEALTH CHECK
+GET http://localhost:5000/health
+
+###
+# 2. SEED DATABASE WITH DUMMY DATA
+POST http://localhost:5000/api/seed
+
+###
+# 3. GET ALL WORKERS
+GET http://localhost:5000/api/workers
+
+###
+# 4. GET ALL WORKSTATIONS
+GET http://localhost:5000/api/workstations
+
+###
+# 5. GET FACTORY-LEVEL METRICS
+GET http://localhost:5000/api/metrics/factory
+
+###
+# 6. GET ALL WORKERS' METRICS
+GET http://localhost:5000/api/metrics/workers
+
+###
+# 7. GET SPECIFIC WORKER METRICS
+GET http://localhost:5000/api/metrics/workers/W1
+
+###
+# 8. GET ALL WORKSTATIONS' METRICS
+GET http://localhost:5000/api/metrics/workstations
+
+###
+# 9. GET SPECIFIC WORKSTATION METRICS
+GET http://localhost:5000/api/metrics/workstations/S1
+
+###
+# 10. INGEST A SINGLE EVENT
+POST http://localhost:5000/api/events
+Content-Type: application/json
+
+{
+  "timestamp": "2026-02-06T14:30:00Z",
+  "worker_id": "W1",
+  "workstation_id": "S1",
+  "event_type": "working",
+  "confidence": 0.95,
+  "count": 0
+}
+
+###
+# 11. INGEST MULTIPLE EVENTS (BATCH)
+POST http://localhost:5000/api/events/batch
+Content-Type: application/json
+
+[
+  {
+    "timestamp": "2026-02-06T14:30:00Z",
+    "worker_id": "W1",
+    "workstation_id": "S1",
+    "event_type": "working",
+    "confidence": 0.95,
+    "count": 0
+  },
+  {
+    "timestamp": "2026-02-06T14:45:00Z",
+    "worker_id": "W1",
+    "workstation_id": "S1",
+    "event_type": "idle",
+    "confidence": 0.88,
+    "count": 0
+  },
+  {
+    "timestamp": "2026-02-06T15:00:00Z",
+    "worker_id": "W1",
+    "workstation_id": "S1",
+    "event_type": "product_count",
+    "confidence": 0.92,
+    "count": 5
+  }
+]
+
+###
+# 12. INGEST A PRODUCT_COUNT EVENT
+POST http://localhost:5000/api/events
+Content-Type: application/json
+
+{
+  "timestamp": "2026-02-06T14:35:00Z",
+  "worker_id": "W2",
+  "workstation_id": "S2",
+  "event_type": "product_count",
+  "confidence": 0.93,
+  "count": 7
+}
+
+###
+# 13. INGEST AN IDLE EVENT
+POST http://localhost:5000/api/events
+Content-Type: application/json
+
+{
+  "timestamp": "2026-02-06T14:40:00Z",
+  "worker_id": "W3",
+  "workstation_id": "S3",
+  "event_type": "idle",
+  "confidence": 0.85,
+  "count": 0
+}
+
+###
+# 14. INGEST AN ABSENT EVENT
+POST http://localhost:5000/api/events
+Content-Type: application/json
+
+{
+  "timestamp": "2026-02-06T14:50:00Z",
+  "worker_id": "W4",
+  "workstation_id": "S4",
+  "event_type": "absent",
+  "confidence": 0.90,
+  "count": 0
+}
+
+###
+# NOTES:
+# 
+# - Replace http://localhost:5000 with your API server URL
+# - All timestamps must be in ISO 8601 format (with Z suffix for UTC)
+# - Worker IDs: W1-W6
+# - Station IDs: S1-S6
+# - Event types: working, idle, absent, product_count
+# - Confidence: 0.0 to 1.0
+# - Count: Only used for product_count events
+#
+# TESTING WITH CURL:
+#
+# curl http://localhost:5000/health
+# curl http://localhost:5000/api/workers
+# curl -X POST http://localhost:5000/api/seed
+# 
+# curl -X POST http://localhost:5000/api/events \
+#   -H "Content-Type: application/json" \
+#   -d '{"timestamp":"2026-02-06T14:30:00Z","worker_id":"W1","workstation_id":"S1","event_type":"working","confidence":0.95,"count":0}'
