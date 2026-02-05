@@ -2,6 +2,15 @@
 
 An AI-powered worker productivity monitoring system that ingests computer vision events from CCTV cameras and displays real-time productivity metrics in an interactive web dashboard.
 
+## Live Demo
+
+**🚀 Deployed Application:** https://web-production-e5d00.up.railway.app
+
+### Quick Links
+- **Dashboard**: https://web-production-e5d00.up.railway.app
+- **API Documentation (Swagger)**: https://web-production-e5d00.up.railway.app/docs
+- **GitHub Repository**: https://github.com/vissinkus1/factory-dashboard
+
 ## Project Overview
 
 This full-stack web application monitors worker activity and workstation utilization in a manufacturing factory. It processes AI-generated events from computer vision systems, computes productivity metrics, and displays them through an intuitive dashboard.
