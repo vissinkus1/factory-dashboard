@@ -111,15 +111,34 @@ def validate_json(*required_fields):
 # INITIALIZATION
 # ============================================================================
 
+def init_database():
+    """Initialize database on startup"""
+    try:
+        db_path = os.path.join(os.path.dirname(__file__), 'factory_dashboard.db')
+        if not os.path.exists(db_path):
+            logger.info("Initializing database...")
+            init_db()
+            seed_database()
+            logger.info("Database initialized successfully")
+        else:
+            logger.info("Database already exists")
+            # Ensure database has data
+            from database import get_workers
+            workers = get_workers()
+            if not workers or len(workers) == 0:
+                logger.info("Database empty, seeding with data...")
+                seed_database()
+    except Exception as e:
+        logger.error(f"Failed to initialize database: {str(e)}")
+        raise
+
+# Initialize database when app starts
+init_database()
+
 @app.before_request
-def startup():
-    """Initialize DB if needed"""
-    db_path = os.path.join(os.path.dirname(__file__), 'factory_dashboard.db')
-    if not os.path.exists(db_path):
-        logger.info("Initializing database...")
-        init_db()
-        seed_database()
-        logger.info("Database initialized successfully")
+def before_request():
+    """Pre-request setup"""
+    pass
 
 @app.errorhandler(404)
 def not_found(error):
