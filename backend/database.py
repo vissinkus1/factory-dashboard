@@ -17,10 +17,38 @@ def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    # Read and execute schema
-    schema_path = os.path.join(os.path.dirname(__file__), '..', 'database', 'schema.sql')
-    with open(schema_path, 'r') as f:
-        schema = f.read()
+    # SQL Schema
+    schema = """
+    CREATE TABLE IF NOT EXISTS workers (
+        worker_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS workstations (
+        station_id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        type TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS events (
+        event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TIMESTAMP NOT NULL,
+        worker_id TEXT NOT NULL,
+        station_id TEXT NOT NULL,
+        event_type TEXT NOT NULL CHECK(event_type IN ('working', 'idle', 'absent', 'product_count')),
+        confidence REAL,
+        count INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (worker_id) REFERENCES workers(worker_id),
+        FOREIGN KEY (station_id) REFERENCES workstations(station_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
+    CREATE INDEX IF NOT EXISTS idx_events_worker ON events(worker_id);
+    CREATE INDEX IF NOT EXISTS idx_events_station ON events(station_id);
+    """
     
     cursor.executescript(schema)
     conn.commit()
